@@ -1,7 +1,7 @@
 class MyNotes {
 
-    private var noteMap = hashMapOf<Int, Notes>()
-    private var noteCommentMap = hashMapOf<Int, Comment>()
+    private val noteMap = hashMapOf<Int, Notes>()
+    private val noteCommentMap = hashMapOf<Int, Comment>()
     private var number = 1
 
 
@@ -10,29 +10,20 @@ class MyNotes {
         return note.id
     }
 
-    fun deleteNote(id: Int): Int {
-        noteMap.remove(id)
-        return 1
-    }
+    fun deleteNote(id: Int): Boolean = noteMap.remove(id) != null
 
-    fun editNote(id: Int, title: String, text: String): Int {
-        val newNote = noteMap.get(id)
-        deleteNote(id)
-        if (newNote != null) {
-            newNote.title = title
-            newNote.text = text
-            addNote(newNote)
+    fun editNote(id: Int, title: String, text: String): Boolean {
+        val newNote = noteMap.remove(id)
+        return if (newNote != null) {
+            addNote(newNote.copy(title = title, text = text))
+            true
         } else {
-            println("Not correct")
+            false
         }
-        return 1
     }
 
-    fun getNotes() {
-        noteMap.forEach {
-            println(it)
-        }
-    }
+    fun getNotes(): Map<Int, Notes> = noteMap.toMap()
+
 
     fun getNotesById(id: Int) {
         println(noteMap.get(id))
@@ -49,16 +40,12 @@ class MyNotes {
         }
     }
 
-    fun deleteComment(noteId: Int, commentId: Int) {
-        val note = noteMap.get(noteId)
-        val comment = noteCommentMap.getValue(noteId)
-        if (noteCommentMap.containsKey(noteId)) {
-            if (commentId.equals(comment.id)) {
-                noteCommentMap.remove(noteId, comment)
-                println("$note ${noteCommentMap.get(noteId)}")
-            }
+    fun deleteComment(noteId: Int, commentId: Int): Boolean {
+        val comment = noteCommentMap[noteId] ?: return false
+        return if (commentId == comment.id) {
+            noteCommentMap.remove(noteId, comment)
         } else {
-            println("Error")
+            false
         }
     }
 
@@ -67,9 +54,6 @@ class MyNotes {
         addComment(noteId, text)
     }
 
-    fun getComments() {
-        noteCommentMap.forEach() {
-            println(it.value)
-        }
-    }
+    fun getComments(): Map<Int, Comment> = noteCommentMap.toMap()
+
 }
